@@ -1,0 +1,7 @@
+# Daily App Report dependencies
+requests>=2.31          # RevenueCat + generic HTTP
+PyJWT>=2.8              # App Store Connect JWT auth
+cryptography>=42.0      # ES256 signing for the App Store Connect .p8 key
+google-auth>=2.29       # Google service-account auth (Google Play)
+google-cloud-storage>=2.16  # Reads Google Play install reports from the GCS bucket
+python-dotenv>=1.0      # Loads credentials from the .env file

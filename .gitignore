@@ -1,0 +1,13 @@
+# Secrets — never commit these
+.env
+secrets/
+*.p8
+*service-account*.json
+
+# Python
+venv/
+__pycache__/
+*.pyc
+
+# Logs
+logs/

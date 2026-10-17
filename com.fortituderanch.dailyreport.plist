@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- macOS launchd job: runs the daily report every morning at 7:00 AM.
+     launchd is the Mac-native "cron" — if the Mac is asleep at 7:00 it runs
+     as soon as it wakes. Install instructions are in README.md.
+     Edit the Hour/Minute below to change the send time. -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.fortituderanch.dailyreport</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/ryangendel/Desktop/AppDailyReport/run_report.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key>
+        <integer>7</integer>
+        <key>Minute</key>
+        <integer>0</integer>
+    </dict>
+
+    <key>WorkingDirectory</key>
+    <string>/Users/ryangendel/Desktop/AppDailyReport</string>
+
+    <key>StandardOutPath</key>
+    <string>/Users/ryangendel/Desktop/AppDailyReport/logs/launchd.out.log</string>
+    <key>StandardErrorPath</key>
+    <string>/Users/ryangendel/Desktop/AppDailyReport/logs/launchd.err.log</string>
+</dict>
+</plist>
