@@ -1,6 +1,6 @@
 # Fortitude Ranch — Daily App Report
 
-Emails Drew (`manager@fortituderanch.com`) a daily summary of:
+Emails a manager a daily summary of:
 
 - **Downloads** — new installs from the App Store (iOS) + Google Play (Android)
 - **Subscriptions & revenue** — active subscriptions, active trials, MRR, revenue,
@@ -145,7 +145,43 @@ crontab -e
 
 ---
 
+## Run it in the cloud instead (GitHub Actions)
+
+Prefer not to depend on your Mac being awake? The repo ships a scheduled
+workflow at `.github/workflows/daily-report.yml` that runs the report in
+GitHub's cloud every morning at **7:00 AM Mountain** (it fires at both 13:00
+and 14:00 UTC and only sends at the real 7 AM, so it stays correct across
+daylight-saving changes). You can also trigger it any time from the repo's
+**Actions** tab → **Run workflow**.
+
+Credentials are stored as encrypted **GitHub Actions secrets** — never in the
+repo. Set them once with the GitHub CLI from your local files:
+
+```bash
+# simple values
+gh secret set REVENUECAT_API_KEY      --body "<your value>"
+gh secret set REVENUECAT_PROJECT_ID   --body "<your value>"
+gh secret set ASC_ISSUER_ID           --body "<your value>"
+gh secret set ASC_KEY_ID              --body "<your value>"
+gh secret set ASC_VENDOR_NUMBER       --body "<your value>"
+gh secret set GPLAY_BUCKET            --body "<your value>"
+gh secret set GPLAY_PACKAGE_NAME      --body "<your value>"
+gh secret set GMAIL_ADDRESS           --body "<your value>"
+gh secret set GMAIL_APP_PASSWORD      --body "<your value>"
+gh secret set REPORT_TO               --body "<recipient email>"
+
+# file contents (whole file becomes the secret value)
+gh secret set ASC_PRIVATE_KEY             < secrets/AuthKey_XXXX.p8
+gh secret set GPLAY_SERVICE_ACCOUNT_JSON  < secrets/your-service-account.json
+```
+
+The workflow reconstructs the `.p8` and service-account files from those
+secrets at run time and deletes them afterward.
+
+---
+
 ## Security
 
-Your credentials live only in `.env` and the `secrets/` folder, both excluded
-from version control by `.gitignore`. Don't email or share those files.
+Your local credentials live only in `.env` and the `secrets/` folder, both
+excluded from version control by `.gitignore`. In the cloud they live only in
+GitHub Actions secrets. Don't email, commit, or share those files.

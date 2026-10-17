@@ -195,12 +195,12 @@ def main():
         username=_env("GMAIL_ADDRESS"),
         app_password=_env("GMAIL_APP_PASSWORD"),
         sender=_env("GMAIL_ADDRESS"),
-        to=_env("REPORT_TO", default="manager@fortituderanch.com", required=False),
+        to=_env("REPORT_TO"),
         subject=subject,
         text_body=text_body,
         html_body=html_body,
     )
-    print(f"Sent report to {_env('REPORT_TO', default='manager@fortituderanch.com', required=False)}")
+    print(f"Sent report to {_env('REPORT_TO')}")
 
 
 if __name__ == "__main__":
