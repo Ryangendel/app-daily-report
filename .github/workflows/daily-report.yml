@@ -3,11 +3,16 @@ name: Daily App Report
 # Runs in GitHub's cloud — no local machine required.
 on:
   schedule:
-    # GitHub Actions cron is in UTC and does not observe daylight saving, so we
-    # fire at both candidate times and let the job run only when it is actually
-    # 07:00 in America/Denver. 13:00 UTC = 7 AM MDT; 14:00 UTC = 7 AM MST.
+    # 13:00 UTC = 7:00 AM Mountain Daylight / 6:00 AM Mountain Standard.
+    #
+    # NOTE: GitHub Actions does not run scheduled jobs on time. Under load they
+    # are queued and often delayed by an hour or more, so the report actually
+    # lands mid-morning Mountain time rather than exactly 7:00. A single daily
+    # cron (no hour gate) guarantees exactly one email every morning. The
+    # previous version fired twice and gated on the Denver hour being exactly
+    # "07" — but delayed runs never hit that window, so every scheduled run
+    # silently skipped and no email was sent.
     - cron: "0 13 * * *"
-    - cron: "0 14 * * *"
   workflow_dispatch: {}  # allows manual "Run workflow" from the Actions tab
 
 jobs:
@@ -20,24 +25,10 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Decide whether it is 7 AM Mountain
-        id: gate
-        run: |
-          HOUR=$(TZ=America/Denver date +%H)
-          echo "America/Denver hour is $HOUR"
-          if [ "$HOUR" = "07" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "run=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "run=false (skipping — not 7 AM MT)"
-            echo "run=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Install dependencies
-        if: steps.gate.outputs.run == 'true'
         run: pip install -r requirements.txt
 
       - name: Write credential files from secrets
-        if: steps.gate.outputs.run == 'true'
         env:
           ASC_PRIVATE_KEY: ${{ secrets.ASC_PRIVATE_KEY }}
           GPLAY_SERVICE_ACCOUNT_JSON: ${{ secrets.GPLAY_SERVICE_ACCOUNT_JSON }}
@@ -46,7 +37,6 @@ jobs:
           printf '%s' "$GPLAY_SERVICE_ACCOUNT_JSON" > gplay-service-account.json
 
       - name: Send the daily report
-        if: steps.gate.outputs.run == 'true'
         env:
           REVENUECAT_API_KEY: ${{ secrets.REVENUECAT_API_KEY }}
           REVENUECAT_PROJECT_ID: ${{ secrets.REVENUECAT_PROJECT_ID }}
